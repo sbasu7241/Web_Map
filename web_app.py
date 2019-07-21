@@ -2,6 +2,7 @@ import folium
 import pandas
 
 data = pandas.read_csv("countries.csv")
+data.set_index("city",inplace=True,drop=False)
 lat = list(data["lat"])
 lon = list(data["lng"])
 pop = list(data["population"])
@@ -15,8 +16,30 @@ def color_producer(elevation):
     else:
         return 'red'
 
+source = input("Enter source : ")
+
+destination = input("Enter destination : ")
+
+points = []
+
+points.append(tuple(data.loc[source,"lat":"lng"]))
+points.append(tuple(data.loc[destination,"lat":"lng"]))
+
+
 
 map = folium.Map(location=[23.892126, 78.115779], zoom_start=6)
+
+fgl = folium.FeatureGroup(name="Journey")
+
+
+#add markers
+for each in points:
+    fgl.add_child(folium.Marker(location=list(each)))
+ 
+#add lines
+fgl.add_child(folium.PolyLine(points, color="black", weight=2.5, opacity=1))
+
+
 
 fgv = folium.FeatureGroup(name="Cities")
 
@@ -27,12 +50,14 @@ for lt, ln, cty, popul in zip(lat, lon, city, pop):
 fgp = folium.FeatureGroup(name="Population")
 
 fgp.add_child(folium.GeoJson(data=open('india_state.json', 'r', encoding='utf-8-sig').read(),
-style_function=lambda x: {'fillColor':'blue' if ord(x['properties']['NAME_1'][0]) < 72
+style_function=lambda x: {'fillColor':'green' if ord(x['properties']['NAME_1'][0]) < 72
 else 'orange' if 72 <= ord(x['properties']['NAME_1'][0]) < 81 else 'red'}))
+
+
 
 map.add_child(fgp)
 map.add_child(fgv)
-
+map.add_child(fgl)
 map.add_child(folium.LayerControl())
 
 map.save("Map.html")
