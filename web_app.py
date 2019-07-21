@@ -1,5 +1,6 @@
 import folium
 import pandas
+import os
 
 data = pandas.read_csv("countries.csv")
 data.set_index("city",inplace=True,drop=False)
@@ -15,10 +16,14 @@ def color_producer(elevation):
         return 'orange'
     else:
         return 'red'
+    
+print("\n\n************** Kick Trip App **************\n")
 
 source = input("Enter source : ")
 
-destination = input("Enter destination : ")
+destination = input("\nEnter destination : ")
+
+
 
 points = []
 
@@ -33,12 +38,12 @@ fgl = folium.FeatureGroup(name="Journey")
 
 
 #add markers
-for each in points:
-    fgl.add_child(folium.Marker(location=list(each)))
- 
+fgl.add_child(folium.Marker(location=list(points[0]),icon=folium.Icon(color='red',icon='home')))
+fgl.add_child(folium.Marker(location=list(points[1]),icon=folium.Icon(color='red')))
+
+    
 #add lines
 fgl.add_child(folium.PolyLine(points, color="black", weight=2.5, opacity=1))
-
 
 
 fgv = folium.FeatureGroup(name="Cities")
@@ -61,3 +66,6 @@ map.add_child(fgl)
 map.add_child(folium.LayerControl())
 
 map.save("Map.html")
+
+print("\nYour journey has been plotted. Opening in browser mode .... ")
+os.system("start Map.html")
